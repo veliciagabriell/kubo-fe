@@ -1,10 +1,14 @@
-import type { ContainerMatch, ExportDocument, Payment, Shipment } from "@/types";
+import type { ContainerMatch, ExportDocument, OriginPortsInfo, Payment, Shipment, VesselIdentity, Voyage } from "@/types";
 import type {
   ApiContainer,
   ApiDocument,
   ApiDocumentTypeInfo,
   ApiOrder,
+  ApiOriginPortsInfo,
+  ApiScoredContainer,
   ApiShipment,
+  ApiVessel,
+  ApiVoyage,
 } from "./api-types";
 
 export function mapShipment(s: ApiShipment): Shipment {
@@ -53,21 +57,70 @@ export function mapShipment(s: ApiShipment): Shipment {
   };
 }
 
-export function mapContainerMatch(c: ApiContainer): ContainerMatch {
+export function mapVesselIdentity(v: ApiVessel): VesselIdentity {
+  return {
+    mmsi: v.mmsi,
+    imo: v.imo,
+    name: v.name,
+    shipTypeLabel: v.shipTypeLabel,
+    estimatedTeu: v.estimatedTeu,
+    estimatedCapacityCbm: v.estimatedCapacityCbm,
+    capacityEstimateJustification: v.capacityEstimateJustification,
+    lastDraughtM: v.lastDraughtM,
+    fullnessPercent: v.fullnessPercent,
+    fullnessJustification: v.fullnessJustification,
+    fullnessUpdatedAt: v.fullnessUpdatedAt,
+    estimatedLocation: v.estimatedLocation,
+    lastEtaRaw: v.lastEtaRaw,
+    lastPositionAt: v.lastPositionAt,
+  };
+}
+
+export function mapOriginPortsInfo(o: ApiOriginPortsInfo): OriginPortsInfo {
+  return { jepara: o.jepara, distances: o.distances, recommended: o.recommended, justification: o.justification };
+}
+
+export function mapVoyage(v: ApiVoyage): Voyage {
+  return {
+    id: v.id,
+    originPort: v.originPort,
+    destinationPort: v.destinationPort,
+    destinationConfidence: v.destinationConfidence,
+    status: v.status,
+    departedAt: v.departedAt,
+    arrivedAt: v.arrivedAt,
+    lastSeenAt: v.lastSeenAt,
+    vessel: v.vessel ? mapVesselIdentity(v.vessel) : null,
+  };
+}
+
+export function mapContainerMatch(c: ApiContainer | ApiScoredContainer): ContainerMatch {
+  const scored = "aiRationale" in c ? c : null;
   return {
     id: c.id,
     originPort: c.originPort,
     destinationPort: c.destinationCity,
+    destinationConfidence: c.destinationConfidence,
     shipmentType: c.shipmentType,
     estimatedDeparture: c.estimatedDeparture,
     cargoCutoff: c.cargoCutoff ?? c.estimatedDeparture,
     documentCutoff: c.documentCutoff ?? c.estimatedDeparture,
     transitDays: c.transitDays,
-    forwarder: c.forwarder,
+    vessel: c.vessel ? mapVesselIdentity(c.vessel) : null,
     occupancy: c.occupancy,
     remainingCbm: c.remainingCbm,
     participants: c.participants,
     status: c.matchStatus as ContainerMatch["status"],
+    freightEstimateJustification: c.freightEstimateJustification,
+    originPortDistanceFromJeparaKm: c.originPortDistanceFromJeparaKm,
+    originPortDistanceJustification: c.originPortDistanceJustification,
+    estimatedArrivalInJapan: c.estimatedArrivalInJapan,
+    estimatedArrivalJustification: c.estimatedArrivalJustification,
+    departureConfirmed: c.departureConfirmed,
+    departureEstimateJustification: c.departureEstimateJustification,
+    daysFromPreferredDate: scored?.daysFromPreferredDate ?? null,
+    aiRationale: scored?.aiRationale ?? null,
+    finalScoreJustification: scored?.finalScoreJustification ?? null,
     costs: c.costs,
   };
 }

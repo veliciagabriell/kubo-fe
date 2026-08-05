@@ -66,10 +66,55 @@ export interface ApiCostBreakdown {
   total: number;
 }
 
+export interface ApiEstimatedLocation {
+  city: string;
+  country: string;
+  approxDistanceKm: number;
+  justification: string;
+}
+
+export interface ApiVessel {
+  mmsi: string;
+  imo: string | null;
+  name: string | null;
+  callsign?: string | null;
+  shipTypeLabel: string | null;
+  lengthM?: number | null;
+  beamM?: number | null;
+  estimatedTeu: number | null;
+  estimatedCapacityCbm: number | null;
+  capacityEstimateJustification: string | null;
+  lastDraughtM: number | null;
+  fullnessPercent: number | null;
+  fullnessJustification: string | null;
+  fullnessUpdatedAt: string | null;
+  lastDestinationRaw?: string | null;
+  lastEtaRaw: string | null;
+  estimatedLocation: ApiEstimatedLocation | null;
+  lastSpeedKn?: number | null;
+  lastCourseDeg?: number | null;
+  lastPositionAt: string | null;
+}
+
+export interface ApiVoyage {
+  id: string;
+  originPort: string;
+  destinationPort: string | null;
+  destinationConfidence: "guessed_from_ais_text" | "confirmed_by_geofence" | null;
+  status: "AWAITING_DEPARTURE" | "DEPARTED" | "ARRIVED" | "STALE";
+  departedAt: string | null;
+  arrivedAt: string | null;
+  lastSeenAt: string;
+  vessel: ApiVessel | null;
+}
+
 export interface ApiContainer {
   id: string;
+  voyageId: string;
+  vesselMmsi: string;
   destinationCountry: string;
   destinationCity: string;
+  destinationConfidence: "guessed_from_ais_text" | "confirmed_by_geofence" | null;
   originPort: string;
   containerType: string;
   totalCapacityCbm: number;
@@ -78,21 +123,23 @@ export interface ApiContainer {
   status: string;
   umkmCount: number;
   costPerCbm: number;
+  freightEstimateJustification: string | null;
   shipmentType: "Consolidated LCL";
   estimatedDeparture: string;
   cargoCutoff: string | null;
   documentCutoff: string | null;
-  transitDays: number;
+  transitDays: number | null;
   occupancy: number;
   remainingCbm: number;
   participants: number;
   matchStatus: string;
-  forwarder: {
-    name: string;
-    verified: boolean;
-    rating: number;
-    completedShipments: number;
-  };
+  vessel: ApiVessel | null;
+  originPortDistanceFromJeparaKm: number | null;
+  originPortDistanceJustification: string | null;
+  estimatedArrivalInJapan: string | null;
+  estimatedArrivalJustification: string | null;
+  departureConfirmed: boolean;
+  departureEstimateJustification: string | null;
   costs: ApiCostBreakdown;
 }
 
@@ -100,6 +147,24 @@ export interface ApiScoredContainer extends ApiContainer {
   availableCbm: number;
   utilizationPercent: number;
   matchScore: number;
+  daysFromPreferredDate: number;
+  aiScore: number | null;
+  aiRationale: string | null;
+  finalScore: number;
+  finalScoreJustification: string;
+}
+
+export interface ApiOriginPortDistance {
+  portId: string;
+  label: string;
+  distanceFromJeparaKm: number;
+}
+
+export interface ApiOriginPortsInfo {
+  jepara: { lat: number; lon: number };
+  distances: ApiOriginPortDistance[];
+  recommended: ApiOriginPortDistance;
+  justification: string;
 }
 
 export type ApiDocumentType =

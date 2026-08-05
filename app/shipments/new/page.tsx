@@ -1,2 +1,2 @@
-import AppPage from "@/components/AppPage";
-export default function Page(){return <AppPage kind="shipment-new"/>}
+import { redirect } from "next/navigation";
+export default function Page(){redirect("/matching");}

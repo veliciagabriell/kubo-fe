@@ -1,17 +1,23 @@
 "use client";
 import { useEffect, useState } from "react";
 import { api, ApiError } from "./api";
-import { mapContainerMatch, mapDocument, mapShipment } from "./adapters";
+import { mapContainerMatch, mapDocument, mapOriginPortsInfo, mapShipment, mapVesselIdentity, mapVoyage } from "./adapters";
 import type {
   ApiContainer,
   ApiDocument,
   ApiDocumentSchema,
   ApiDocumentTypeInfo,
   ApiOrder,
+  ApiOriginPortsInfo,
   ApiScoredContainer,
   ApiShipment,
+  ApiVessel,
+  ApiVoyage,
 } from "./api-types";
-import type { ContainerMatch, ExportDocument, Shipment } from "@/types";
+import type { ContainerMatch, ExportDocument, OriginPortsInfo, Shipment, VesselIdentity, Voyage } from "@/types";
+
+/** Live AIS data refresh interval - near-real-time via REST polling (see plan: no dummy fallback, so empty results are expected until AISstream observes a real vessel). */
+const LIVE_POLL_MS = 20_000;
 
 interface AsyncState<T> {
   data: T;
@@ -65,12 +71,18 @@ export function useContainers(forCbm?: number) {
   useEffect(() => {
     let cancelled = false;
     const qs = forCbm ? `?forCbm=${forCbm}` : "";
-    api
-      .get<{ data: ApiContainer[] }>(`/matching/containers${qs}`)
-      .then((res) => !cancelled && setState({ data: res.data.map(mapContainerMatch), loading: false, error: null }))
-      .catch((e) => !cancelled && setState({ data: [], loading: false, error: errorMessage(e, "Gagal memuat container.") }));
+    function load(showLoading: boolean) {
+      if (showLoading) setState((s) => ({ ...s, loading: true }));
+      api
+        .get<{ data: ApiContainer[] }>(`/matching/containers${qs}`)
+        .then((res) => !cancelled && setState({ data: res.data.map(mapContainerMatch), loading: false, error: null }))
+        .catch((e) => !cancelled && setState((s) => ({ ...s, loading: false, error: errorMessage(e, "Gagal memuat container.") })));
+    }
+    load(true);
+    const interval = setInterval(() => load(false), LIVE_POLL_MS);
     return () => {
       cancelled = true;
+      clearInterval(interval);
     };
   }, [forCbm]);
   return state;
@@ -86,16 +98,78 @@ export function useContainer(id?: string, forCbm?: number) {
         cancelled = true;
       };
     }
-    queueMicrotask(() => !cancelled && setState((s) => ({ ...s, loading: true })));
     const qs = forCbm ? `?forCbm=${forCbm}` : "";
+    function load(showLoading: boolean) {
+      if (showLoading) setState((s) => ({ ...s, loading: true }));
+      api
+        .get<{ data: ApiContainer }>(`/matching/containers/${id}${qs}`)
+        .then((res) => !cancelled && setState({ data: mapContainerMatch(res.data), loading: false, error: null }))
+        .catch((e) => !cancelled && setState((s) => ({ ...s, loading: false, error: errorMessage(e, "Container tidak ditemukan.") })));
+    }
+    load(true);
+    const interval = setInterval(() => load(false), LIVE_POLL_MS);
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+    };
+  }, [id, forCbm]);
+  return state;
+}
+
+export function useVessels() {
+  const [state, setState] = useState<AsyncState<VesselIdentity[]>>({ data: [], loading: true, error: null });
+  useEffect(() => {
+    let cancelled = false;
+    function load(showLoading: boolean) {
+      if (showLoading) setState((s) => ({ ...s, loading: true }));
+      api
+        .get<{ data: ApiVessel[] }>("/vessels")
+        .then((res) => !cancelled && setState({ data: res.data.map(mapVesselIdentity), loading: false, error: null }))
+        .catch((e) => !cancelled && setState((s) => ({ ...s, loading: false, error: errorMessage(e, "Gagal memuat data kapal.") })));
+    }
+    load(true);
+    const interval = setInterval(() => load(false), LIVE_POLL_MS);
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+    };
+  }, []);
+  return state;
+}
+
+export function useVoyages() {
+  const [state, setState] = useState<AsyncState<Voyage[]>>({ data: [], loading: true, error: null });
+  useEffect(() => {
+    let cancelled = false;
+    function load(showLoading: boolean) {
+      if (showLoading) setState((s) => ({ ...s, loading: true }));
+      api
+        .get<{ data: ApiVoyage[] }>("/voyages")
+        .then((res) => !cancelled && setState({ data: res.data.map(mapVoyage), loading: false, error: null }))
+        .catch((e) => !cancelled && setState((s) => ({ ...s, loading: false, error: errorMessage(e, "Gagal memuat data pelayaran.") })));
+    }
+    load(true);
+    const interval = setInterval(() => load(false), LIVE_POLL_MS);
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+    };
+  }, []);
+  return state;
+}
+
+export function useOriginPorts() {
+  const [state, setState] = useState<AsyncState<OriginPortsInfo | null>>({ data: null, loading: true, error: null });
+  useEffect(() => {
+    let cancelled = false;
     api
-      .get<{ data: ApiContainer }>(`/matching/containers/${id}${qs}`)
-      .then((res) => !cancelled && setState({ data: mapContainerMatch(res.data), loading: false, error: null }))
-      .catch((e) => !cancelled && setState({ data: null, loading: false, error: errorMessage(e, "Container tidak ditemukan.") }));
+      .get<ApiOriginPortsInfo>("/matching/origin-ports")
+      .then((res) => !cancelled && setState({ data: mapOriginPortsInfo(res), loading: false, error: null }))
+      .catch((e) => !cancelled && setState({ data: null, loading: false, error: errorMessage(e, "Gagal memuat info pelabuhan asal.") }));
     return () => {
       cancelled = true;
     };
-  }, [id, forCbm]);
+  }, []);
   return state;
 }
 
