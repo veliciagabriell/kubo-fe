@@ -214,6 +214,11 @@ export interface ApiDocument {
   generatedSources: string | string[] | null;
   status: string;
   createdAt: string;
+  updatedAt?: string;
+  originalFileName?: string | null;
+  fileVersion?: number;
+  lastValidatedAt?: string | null;
+  validationCount?: number;
 }
 
 export type ApiFieldSourceType =

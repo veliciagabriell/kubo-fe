@@ -12,6 +12,7 @@ export type DocumentStatus =
   | "uploaded"
   | "processing"
   | "draft"
+  | "draft_generated"
   | "conflict"
   | "needs_information"
   | "needs_review"
@@ -106,6 +107,24 @@ export interface ExportDocumentRecord {
   extractedFields: ExtractedField[];
   createdAt: string;
   updatedAt: string;
+  lastCheckedAt?: string | null;
+  checkCount?: number;
+}
+
+export interface DocumentHistoryEvent {
+  id: string;
+  documentId: string;
+  documentType: DocumentType;
+  documentLabel: string;
+  action: "uploaded" | "generated" | "checked";
+  occurredAt: string;
+  status: string;
+}
+
+export interface ShipmentDocumentHistory {
+  shipmentId: string;
+  documents: ExportDocumentRecord[];
+  events: DocumentHistoryEvent[];
 }
 
 export interface DocumentConsistencyIssue {

@@ -428,6 +428,7 @@ export function GeneratedDocumentPreview({ document }: { document: ApiDocument }
         <div className={styles.previewActions}>
           {pdf && <a className="btn btn-primary" href={pdf} download><Download size={16} /> Download PDF</a>}
           {docx && <a className="btn btn-secondary" href={docx} download><Download size={16} /> Download DOCX</a>}
+          <Link className="btn btn-secondary" href="/documents">View in Document Intelligence</Link>
           <Link className="btn btn-secondary" href="/support">Request Review</Link>
         </div>
       </div>

@@ -8,11 +8,13 @@ import type {
 } from "@/lib/api-types";
 import type {
   DocumentCheckResult,
+  DocumentHistoryEvent,
   DocumentGenerationPlan,
   DocumentType,
   ExportDocumentRecord,
   ExtractedField,
   GeneratedDraft,
+  ShipmentDocumentHistory,
 } from "@/types/kubo";
 import { documentDefinitions, documentTypeOrder } from "./document-definitions";
 import { mockForwarderCustomers } from "./mock-data";
@@ -43,14 +45,16 @@ function mapDocument(document: ApiDocument): ExportDocumentRecord {
     shipmentId: document.shipmentId ?? "",
     type,
     label: documentDefinitions[type].label,
-    fileName: document.fileUrl?.split("/").at(-1),
+    fileName: document.originalFileName ?? document.fileUrl?.split("/").at(-1),
     fileUrl: fileUrl(document.fileUrl),
     status: (document.status as ExportDocumentRecord["status"]) || "uploaded",
     origin: document.documentOrigin,
-    version: 1,
+    version: document.fileVersion ?? 1,
     extractedFields: [],
     createdAt: document.createdAt,
-    updatedAt: document.createdAt,
+    updatedAt: document.updatedAt ?? document.createdAt,
+    lastCheckedAt: document.lastValidatedAt,
+    checkCount: document.validationCount ?? 0,
   };
 }
 
@@ -102,6 +106,63 @@ export const documentService = {
       return response.data.map(mapDocument);
     } catch {
       return structuredClone(mockForwarderCustomers.find((item) => item.shipmentId === shipmentId)?.documents ?? []);
+    }
+  },
+
+  async getDocumentHistory(shipmentId: string): Promise<ShipmentDocumentHistory> {
+    try {
+      const response = await api.get<{ data: {
+        documents: Array<{
+          id: string; type: string | null; label: string; origin: ExportDocumentRecord["origin"];
+          status: string; fileName?: string; fileUrl?: string | null; version?: number;
+          createdAt: string; generatedAt?: string | null; lastValidatedAt?: string | null; validationCount?: number;
+        }>;
+        events: Array<{
+          id: string; documentId: string; documentType: string | null; documentLabel: string;
+          action: "uploaded" | "generated" | "checked"; occurredAt: string; status: string;
+        }>;
+      } }>(`/shipments/${shipmentId}/document-history`);
+      return {
+        shipmentId,
+        documents: response.data.documents.map((document) => ({
+          id: document.id,
+          shipmentId,
+          type: fromApiType[document.type ?? ""] ?? "commercial_invoice",
+          label: document.label,
+          fileName: document.fileName,
+          fileUrl: fileUrl(document.fileUrl),
+          status: document.status as ExportDocumentRecord["status"],
+          origin: document.origin,
+          version: document.version ?? 1,
+          extractedFields: [],
+          createdAt: document.createdAt,
+          updatedAt: document.generatedAt ?? document.createdAt,
+          lastCheckedAt: document.lastValidatedAt,
+          checkCount: document.validationCount ?? 0,
+        })),
+        events: response.data.events.map((event) => ({
+          ...event,
+          documentType: fromApiType[event.documentType ?? ""] ?? "commercial_invoice",
+        })),
+      };
+    } catch {
+      const documents = await this.getShipmentDocuments(shipmentId);
+      return {
+        shipmentId,
+        documents,
+        events: documents.flatMap((document) => {
+          const events: DocumentHistoryEvent[] = [{
+            id: `${document.id}:created`, documentId: document.id, documentType: document.type,
+            documentLabel: document.label, action: document.origin === "generated" ? "generated" as const : "uploaded" as const,
+            occurredAt: document.createdAt, status: document.status,
+          }];
+          if (document.lastCheckedAt) events.push({
+            id: `${document.id}:checked`, documentId: document.id, documentType: document.type,
+            documentLabel: document.label, action: "checked", occurredAt: document.lastCheckedAt, status: document.status,
+          });
+          return events;
+        }).sort((left, right) => new Date(right.occurredAt).getTime() - new Date(left.occurredAt).getTime()),
+      };
     }
   },
 
@@ -241,7 +302,8 @@ export const documentService = {
         sources: Array.isArray(response.data.generatedSources) ? response.data.generatedSources : plan.knownFields.map((item) => item.sources[0]?.label).filter(Boolean) as string[],
         reusedFieldCount: plan.knownFields.length,
       };
-    } catch {
+    } catch (error) {
+      if (process.env.NEXT_PUBLIC_ENABLE_DOCUMENT_MOCKS !== "true") throw error;
       return {
         id: `draft-${Date.now()}`,
         shipmentId,
