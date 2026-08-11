@@ -1,5 +1,5 @@
-import { DocumentAssistantScreen } from "@/components/documents/DocumentAssistant";
+import { DocumentsOverviewScreen } from "@/components/documents/DocumentWorkflow";
 
 export default function Page() {
-  return <DocumentAssistantScreen />;
+  return <DocumentsOverviewScreen />;
 }

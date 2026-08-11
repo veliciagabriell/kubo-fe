@@ -1,5 +1,5 @@
-import { DocumentAssistantCatalogScreen } from "@/components/documents/DocumentAssistant";
+import { DocumentGenerationEntryScreen } from "@/components/documents/DocumentWorkflow";
 
 export default function Page() {
-  return <DocumentAssistantCatalogScreen />;
+  return <DocumentGenerationEntryScreen />;
 }

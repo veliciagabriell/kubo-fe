@@ -1,0 +1,108 @@
+import type {
+  CanonicalShipmentData,
+  ExportDocumentRecord,
+  ForwarderCustomer,
+  ForwarderLead,
+} from "@/types/kubo";
+
+const now = "2026-08-12T08:00:00.000Z";
+
+const source = (label: string, sourceType: "shipment" | "uploaded_document" = "shipment") => ({ sourceType, label });
+
+export const mockCanonicalShipment: CanonicalShipmentData = {
+  shipmentId: "KUB-24081",
+  shipmentCode: "KUB-24081",
+  routeLabel: "Jepara → Tokyo",
+  updatedAt: now,
+  fields: {
+    exporter_name: { key: "exporter_name", label: "Exporter", value: "Aleka Ukiran", status: "confirmed", sources: [source("Company Profile")], updatedAt: now },
+    exporter_address: { key: "exporter_address", label: "Exporter Address", value: "Jalan Jepara 3 Hutama, Jepara, Indonesia", status: "confirmed", sources: [source("Company Profile")], updatedAt: now },
+    consignee_name: { key: "consignee_name", label: "Buyer / Consignee", value: "Mori Living", status: "confirmed", sources: [source("Shipment Information")], updatedAt: now },
+    consignee_address: { key: "consignee_address", label: "Consignee Address", value: "Aomi, Tokyo, Japan", status: "confirmed", sources: [source("Shipment Information")], updatedAt: now },
+    product_description: { key: "product_description", label: "Product Description", value: "Ukiran Jepara", status: "confirmed", sources: [source("Cargo Information")], updatedAt: now },
+    hs_code: { key: "hs_code", label: "HS Code", value: "9403.60", status: "confirmed", sources: [source("Cargo Information")], updatedAt: now },
+    quantity: { key: "quantity", label: "Quantity", value: 15, status: "confirmed", sources: [source("Commercial Invoice", "uploaded_document")], updatedAt: now },
+    unit: { key: "unit", label: "Unit", value: "unit", status: "confirmed", sources: [source("Cargo Information")], updatedAt: now },
+    gross_weight: { key: "gross_weight", label: "Gross Weight", value: 139, status: "confirmed", sources: [source("Packing List", "uploaded_document")], updatedAt: now },
+    net_weight: { key: "net_weight", label: "Net Weight", value: 135, status: "confirmed", sources: [source("Packing List", "uploaded_document")], updatedAt: now },
+    cbm: { key: "cbm", label: "CBM", value: 4, status: "confirmed", sources: [source("Cargo Information")], updatedAt: now },
+    package_type: { key: "package_type", label: "Package Type", value: "Karton berlapis", status: "confirmed", sources: [source("Cargo Information")], updatedAt: now },
+    package_count: { key: "package_count", label: "Package Count", value: 6, status: "confirmed", sources: [source("Packing List", "uploaded_document")], updatedAt: now },
+    origin_port: { key: "origin_port", label: "Port of Loading", value: "Tanjung Emas, Semarang", status: "confirmed", sources: [source("Container Match")], updatedAt: now },
+    destination_port: { key: "destination_port", label: "Port of Discharge", value: "Tokyo", status: "confirmed", sources: [source("Container Match")], updatedAt: now },
+    destination_country: { key: "destination_country", label: "Country of Destination", value: "Japan", status: "confirmed", sources: [source("Shipment Information")], updatedAt: now },
+    country_of_origin: { key: "country_of_origin", label: "Country of Origin", value: "Indonesia", status: "confirmed", sources: [source("Shipment Information")], updatedAt: now },
+    invoice_number: { key: "invoice_number", label: "Invoice Number", value: "TEST-CI-ALEKA-20260809", status: "confirmed", sources: [source("Commercial Invoice", "uploaded_document")], updatedAt: now },
+    invoice_date: { key: "invoice_date", label: "Invoice Date", value: "2026-08-09", status: "confirmed", sources: [source("Commercial Invoice", "uploaded_document")], updatedAt: now },
+    currency: { key: "currency", label: "Currency", value: "USD", status: "confirmed", sources: [source("Commercial Invoice", "uploaded_document")], updatedAt: now },
+    unit_price: { key: "unit_price", label: "Unit Price", value: 125, status: "confirmed", sources: [source("Commercial Invoice", "uploaded_document")], updatedAt: now },
+  },
+};
+
+const mockDocuments: ExportDocumentRecord[] = [
+  {
+    id: "doc-ci-24081", shipmentId: "KUB-24081", type: "commercial_invoice", label: "Commercial Invoice",
+    fileName: "KUBO_Test_Commercial_Invoice.pdf", fileUrl: null, status: "verified", origin: "uploaded", version: 1,
+    createdAt: now, updatedAt: now,
+    extractedFields: [
+      { fieldKey: "quantity", label: "Quantity", value: "15 unit", confidence: 0.97, sourceDocumentId: "doc-ci-24081", sourcePage: 1, source: { sourceType: "uploaded_document", label: "Commercial Invoice", fileName: "KUBO_Test_Commercial_Invoice.pdf", page: 1, rawText: "Quantity: 15 units" }, status: "consistent" },
+      { fieldKey: "invoice_number", label: "Invoice Number", value: "TEST-CI-ALEKA-20260809", confidence: 0.98, sourceDocumentId: "doc-ci-24081", sourcePage: 1, status: "confirmed" },
+    ],
+  },
+  {
+    id: "doc-pl-24081", shipmentId: "KUB-24081", type: "packing_list", label: "Packing List",
+    fileName: "KUBO_Test_Packing_List.pdf", fileUrl: null, status: "needs_review", origin: "uploaded", version: 2,
+    createdAt: now, updatedAt: now,
+    extractedFields: [
+      { fieldKey: "quantity", label: "Quantity", value: "12 unit", confidence: 0.91, sourceDocumentId: "doc-pl-24081", sourcePage: 1, source: { sourceType: "uploaded_document", label: "Packing List", fileName: "KUBO_Test_Packing_List.pdf", page: 1, rawText: "Total quantity 12 units" }, status: "conflict" },
+      { fieldKey: "gross_weight", label: "Gross Weight", value: "139 kg", confidence: 0.97, sourceDocumentId: "doc-pl-24081", sourcePage: 1, status: "consistent" },
+    ],
+  },
+  {
+    id: "doc-coo-24081", shipmentId: "KUB-24081", type: "certificate_of_origin", label: "Certificate of Origin",
+    fileName: "Certificate_of_Origin_DRAFT.pdf", fileUrl: null, status: "draft", origin: "generated", version: 1,
+    createdAt: now, updatedAt: now, extractedFields: [],
+  },
+  {
+    id: "doc-svlk-24081", shipmentId: "KUB-24081", type: "svlk", label: "SVLK",
+    fileName: "SVLK_Aleka.pdf", fileUrl: null, status: "uploaded", origin: "uploaded", version: 1,
+    createdAt: now, updatedAt: now, extractedFields: [],
+  },
+  {
+    id: "doc-bl-24081", shipmentId: "KUB-24081", type: "bill_of_lading", label: "Bill of Lading",
+    status: "waiting_external_data", origin: "external", version: 0, createdAt: now, updatedAt: now, extractedFields: [],
+  },
+];
+
+export const mockForwarderCustomers: ForwarderCustomer[] = [
+  {
+    shipmentId: "KUB-24081", exporter: "Aleka Ukiran", exporterContact: "Aleka Permana · aleka@example.com",
+    origin: "Jepara", destination: "Tokyo / Yokohama", cargoReadyDate: "2026-08-24", cargoCutoff: "2026-08-22",
+    cbm: 4, grossWeightKg: 139, netWeightKg: 135, product: "Ukiran Jepara", hsCode: "9403.60", quantity: "15 unit",
+    packaging: "Karton berlapis", handling: "Tidak ada penanganan khusus", consignee: "Mori Living, Aomi, Tokyo",
+    paymentStatus: "fully_paid", amountPaid: 18450000, paymentDate: "2026-08-10", bookingReference: "KUBO-PAY-24081",
+    documentReadiness: 80, shipmentStatus: "Ready to Process",
+    matching: { originPort: "Tanjung Emas", destinationPort: "Tokyo", shipmentType: "Consolidated LCL", estimatedDeparture: "2026-08-27", cargoCutoff: "2026-08-22", remainingCapacityCbm: 18, freightForwarder: "Nusantara Forwarding", status: "Offer Accepted" },
+    documents: mockDocuments,
+  },
+  {
+    shipmentId: "KUB-24086", exporter: "Batik Nusantara", exporterContact: "Sari Dewi · sari@example.com",
+    origin: "Solo", destination: "Osaka", cargoReadyDate: "2026-08-28", cargoCutoff: "2026-08-25",
+    cbm: 2.4, grossWeightKg: 210, netWeightKg: 198, product: "Home textile", hsCode: "6302.60", quantity: "240 pcs",
+    packaging: "12 cartons", handling: "Keep dry", consignee: "Sakura Textile Co., Osaka",
+    paymentStatus: "deposit_paid", amountPaid: 5200000, paymentDate: "2026-08-11", bookingReference: "KUBO-PAY-24086",
+    documentReadiness: 67, shipmentStatus: "Documents Incomplete",
+    matching: { originPort: "Tanjung Perak", destinationPort: "Osaka", shipmentType: "Consolidated LCL", estimatedDeparture: "2026-08-31", cargoCutoff: "2026-08-25", remainingCapacityCbm: 9.6, freightForwarder: "Nusantara Forwarding", status: "Deposit Received" },
+    documents: [],
+  },
+];
+
+export const mockForwarderLeads: ForwarderLead[] = [
+  { shipmentId: "KUB-24091", exporterDisplayName: "Aleka Ukiran", origin: "Jepara", destination: "Tokyo", productCategory: "Furniture", cbm: 4, grossWeightKg: 139, cargoReadyDate: "2026-08-24", preferredDepartureEnd: "2026-08-31", packaging: "Karton berlapis", stackable: true, handlingRequirements: "Standard dry cargo", documentReadiness: 80, routeMatch: "Excellent", scheduleMatch: "Good", capacityMatch: "Excellent", compatibilityEstimate: 92 },
+  { shipmentId: "KUB-24092", exporterDisplayName: "UMKM Mebel Jateng", origin: "Semarang", destination: "Yokohama", productCategory: "Wood furniture", cbm: 7.5, grossWeightKg: 560, cargoReadyDate: "2026-08-29", preferredDepartureEnd: "2026-09-05", packaging: "Wooden crate", stackable: false, handlingRequirements: "Fragile corners", documentReadiness: 62, routeMatch: "Excellent", scheduleMatch: "Good", capacityMatch: "Good", compatibilityEstimate: 86 },
+  { shipmentId: "KUB-24095", exporterDisplayName: "Verified textile exporter", origin: "Surabaya", destination: "Osaka", productCategory: "Home textile", cbm: 3.2, grossWeightKg: 280, cargoReadyDate: "2026-09-02", preferredDepartureEnd: "2026-09-10", packaging: "18 cartons", stackable: true, handlingRequirements: "Keep dry", documentReadiness: 45, routeMatch: "Good", scheduleMatch: "Fair", capacityMatch: "Excellent", compatibilityEstimate: 74 },
+];
+
+export function cloneCanonical(shipmentId: string) {
+  return structuredClone({ ...mockCanonicalShipment, shipmentId, shipmentCode: shipmentId });
+}

@@ -3,6 +3,7 @@ import { createContext, useCallback, useContext, useEffect, useState } from "rea
 import { useRouter } from "next/navigation";
 import { api, ApiError, getToken, setToken } from "@/lib/api";
 import type { ApiUser } from "@/lib/api-types";
+import { homeForRole, resolveUserRole } from "@/lib/roles";
 
 interface AuthContextValue {
   user: ApiUser | null;
@@ -55,7 +56,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         );
         setToken(res.access_token);
         setUser(res.user);
-        router.push("/dashboard");
+        router.push(homeForRole(resolveUserRole(res.user)));
       } catch (e) {
         setError(e instanceof ApiError ? e.message : "Gagal masuk. Coba lagi.");
         throw e;
@@ -75,7 +76,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         );
         setToken(res.access_token);
         setUser(res.user);
-        router.push("/dashboard");
+        router.push(homeForRole(resolveUserRole(res.user)));
       } catch (e) {
         setError(e instanceof ApiError ? e.message : "Gagal mendaftar. Coba lagi.");
         throw e;

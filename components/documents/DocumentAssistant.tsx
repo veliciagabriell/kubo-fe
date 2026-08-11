@@ -37,6 +37,7 @@ import { useDocumentTypes, useShipments } from "@/lib/hooks";
 import { formatDate } from "@/utils/format";
 import AppShell from "@/components/layout/AppShell";
 import RequireAuth from "@/components/RequireAuth";
+import RoleGuard from "@/components/RoleGuard";
 import styles from "./document-assistant.module.css";
 
 type ProcessingStatus =
@@ -780,9 +781,9 @@ export function GenerateDraftPanel({ type }: { type: ApiDocumentType }) {
 export function DocumentAssistantScreen() {
   return (
     <RequireAuth>
-      <AppShell>
+      <RoleGuard role="umkm"><AppShell>
         <DocumentAssistantPage />
-      </AppShell>
+      </AppShell></RoleGuard>
     </RequireAuth>
   );
 }
@@ -790,9 +791,9 @@ export function DocumentAssistantScreen() {
 export function DocumentAssistantCatalogScreen() {
   return (
     <RequireAuth>
-      <AppShell>
+      <RoleGuard role="umkm"><AppShell>
         <DocumentAssistantCatalogPage />
-      </AppShell>
+      </AppShell></RoleGuard>
     </RequireAuth>
   );
 }
@@ -800,9 +801,9 @@ export function DocumentAssistantCatalogScreen() {
 export function DocumentGenerationScreen({ type }: { type: ApiDocumentType }) {
   return (
     <RequireAuth>
-      <AppShell>
+      <RoleGuard role="umkm"><AppShell>
         <GenerateDraftPanel type={type} />
-      </AppShell>
+      </AppShell></RoleGuard>
     </RequireAuth>
   );
 }

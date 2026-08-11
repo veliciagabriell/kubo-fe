@@ -10,6 +10,7 @@ export interface ApiUser {
   nib: string | null;
   createdAt: string;
   updatedAt: string;
+  role?: "umkm" | "freight_forwarder";
 }
 
 export interface ApiShipment {
