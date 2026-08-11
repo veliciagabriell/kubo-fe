@@ -199,13 +199,166 @@ export interface ApiDocument {
   id: string;
   userId: string;
   shipmentId: string | null;
-  type: ApiDocumentType;
+  type: ApiDocumentType | null;
   fields: Record<string, string>;
   items: Record<string, string>[] | null;
   generatedContent: string | null;
   fileUrl: string | null;
+  docxFileUrl: string | null;
+  documentOrigin: "uploaded" | "generated" | "external";
+  templateVersion: string | null;
+  shipmentSnapshotId: string | null;
+  generatedAt: string | null;
+  generatedBy: string | null;
+  generatedSources: string | string[] | null;
   status: string;
   createdAt: string;
+}
+
+export type ApiFieldSourceType =
+  | "company_profile"
+  | "shipment"
+  | "cargo"
+  | "container_match"
+  | "vessel_match"
+  | "uploaded_document"
+  | "generated_document"
+  | "freight_forwarder";
+
+export type ApiFieldValidationStatus =
+  | "valid"
+  | "missing"
+  | "invalid"
+  | "conflict"
+  | "needs_confirmation"
+  | "waiting_external_data";
+
+export interface ApiFieldSource {
+  documentId?: string;
+  documentType?: string;
+  fileName?: string;
+  page?: number;
+  rawText?: string;
+  boundingBox?: number[];
+  sourceType: ApiFieldSourceType;
+  label: string;
+}
+
+export interface ApiConflictCandidate {
+  value: string;
+  normalizedValue: string;
+  unit?: string;
+  source: ApiFieldSource;
+}
+
+export interface ApiDocumentField {
+  key: string;
+  canonicalKey: string;
+  label: string;
+  required: boolean;
+  userEditable: boolean;
+  value?: string;
+  normalizedValue?: string;
+  unit?: string;
+  status: ApiFieldValidationStatus;
+  confidence?: number;
+  sources: ApiFieldSource[];
+  conflictCandidates?: ApiConflictCandidate[];
+  externalMessage?: string;
+}
+
+export interface ApiDocumentReadiness {
+  totalFields: number;
+  validFields: number;
+  missingFields: number;
+  conflictFields: number;
+  invalidFields: number;
+  confirmationFields: number;
+  waitingExternalFields: number;
+  readinessPercent: number;
+  canGenerateDraft: boolean;
+}
+
+export interface ApiAssistantShipment {
+  id: string;
+  code: string;
+  origin: string;
+  destination: string;
+  cargoReadyDate: string;
+  status: string;
+}
+
+export interface ApiDocumentAssistantCard {
+  type: ApiDocumentType;
+  label: string;
+  category: string;
+  status: string;
+  origin: "uploaded" | "generated" | "external" | null;
+  documentId: string | null;
+  fileUrl: string | null;
+  docxFileUrl: string | null;
+  readiness: ApiDocumentReadiness;
+  knownFields: number;
+  totalFields: number;
+  sources: string[];
+  primaryAction: "review" | "preview" | "generate" | "resolve";
+}
+
+export interface ApiCrossDocumentConflict {
+  field: string;
+  candidates: Array<{
+    value: string;
+    unit?: string;
+    source: ApiFieldSource;
+  }>;
+}
+
+export interface ApiDocumentAssistantOverview {
+  shipment: ApiAssistantShipment;
+  readiness: {
+    readinessPercent: number;
+    readyDocuments: number;
+    attentionDocuments: number;
+    unavailableDocuments: number;
+  };
+  company: { name: string; nib: string | null; status: string };
+  crossDocumentValidation: {
+    status: "valid" | "conflict";
+    conflictCount: number;
+    message: string;
+    conflicts: ApiCrossDocumentConflict[];
+  };
+  documents: ApiDocumentAssistantCard[];
+}
+
+export interface ApiDocumentGenerationReadiness {
+  type: ApiDocumentType;
+  label: string;
+  category: string;
+  shipment: ApiAssistantShipment;
+  fields: ApiDocumentField[];
+  readiness: ApiDocumentReadiness;
+  sources: string[];
+}
+
+export interface ApiUploadedDocumentValidation {
+  document: {
+    id: string;
+    type: ApiDocumentType;
+    label: string;
+    fileName: string | null;
+    origin: string;
+    status: string;
+  };
+  shipment: ApiAssistantShipment;
+  readiness: ApiDocumentReadiness;
+  fields: ApiDocumentField[];
+  debug: {
+    parser: string | null;
+    classificationConfidence: number | null;
+    classificationMethod: string | null;
+    hasTextLayer: boolean | null;
+  };
 }
 
 export interface ApiOrder {

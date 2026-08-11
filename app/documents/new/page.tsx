@@ -1,2 +1,5 @@
-import AppPage from "@/components/AppPage";
-export default function Page(){return <AppPage kind="document-new"/>}
+import { DocumentAssistantCatalogScreen } from "@/components/documents/DocumentAssistant";
+
+export default function Page() {
+  return <DocumentAssistantCatalogScreen />;
+}

@@ -182,7 +182,7 @@ export async function findMatches(destinationCountry: string, volumeCbm: number,
   return res.data.map(mapContainerMatch);
 }
 
-export function useDocuments(shipmentId?: string) {
+export function useDocuments(shipmentId?: string, refreshToken = 0) {
   const [state, setState] = useState<AsyncState<ExportDocument[]>>({ data: [], loading: true, error: null });
   useEffect(() => {
     let cancelled = false;
@@ -197,7 +197,7 @@ export function useDocuments(shipmentId?: string) {
     return () => {
       cancelled = true;
     };
-  }, [shipmentId]);
+  }, [shipmentId, refreshToken]);
   return state;
 }
 

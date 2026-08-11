@@ -127,10 +127,11 @@ export function mapContainerMatch(c: ApiContainer | ApiScoredContainer): Contain
 
 export function mapDocument(d: ApiDocument, typeInfo?: ApiDocumentTypeInfo[]): ExportDocument {
   const info = typeInfo?.find((t) => t.type === d.type);
+  const type = d.type ?? "UNCLASSIFIED";
   return {
     id: d.id,
-    type: d.type,
-    typeLabel: info?.label ?? d.type,
+    type,
+    typeLabel: info?.label ?? (d.type ? d.type : "Dokumen diunggah"),
     category: info?.category ?? "",
     shipmentId: d.shipmentId,
     status: d.status as ExportDocument["status"],

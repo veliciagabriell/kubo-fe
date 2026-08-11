@@ -1,0 +1,811 @@
+.page {
+  width: min(1120px, 100%);
+  display: grid;
+  gap: 24px;
+  color: #141547;
+}
+.pageHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 24px;
+}
+.pageHeader h1 {
+  font-size: 34px;
+  line-height: 1.1;
+  color: #041a6c;
+  letter-spacing: -0.03em;
+  margin: 4px 0 8px;
+}
+.pageHeader p {
+  color: #62636d;
+  max-width: 720px;
+  line-height: 1.6;
+}
+.eyebrow {
+  color: #fa8615;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-weight: 800;
+  font-size: 11px;
+}
+.card {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  box-shadow: 0 14px 34px -24px rgba(20, 21, 71, 0.3);
+}
+.shipmentSelector {
+  padding: 18px 22px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px;
+}
+.shipmentSelector label {
+  display: grid;
+  gap: 7px;
+  min-width: min(460px, 100%);
+}
+.shipmentSelector label > span {
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: #62636d;
+}
+.shipmentSelector select,
+.uploadControls select,
+.missingGrid input {
+  min-height: 44px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: #fff;
+  padding: 10px 12px;
+  color: #141547;
+}
+.shipmentMeta {
+  display: flex;
+  gap: 18px;
+  font-size: 12px;
+  color: #62636d;
+}
+.readinessSummary {
+  padding: 26px;
+  display: grid;
+  grid-template-columns: 160px 1fr;
+  gap: 28px;
+  align-items: center;
+}
+.readinessGauge {
+  width: 142px;
+  height: 142px;
+  border-radius: 50%;
+  display: grid;
+  place-content: center;
+  text-align: center;
+  background:
+    radial-gradient(circle, #fff 58%, transparent 60%),
+    conic-gradient(#fa8615 var(--progress, 78%), #eceaf4 0);
+}
+.readinessGauge strong {
+  font-size: 32px;
+  color: #041a6c;
+}
+.readinessGauge span {
+  font-size: 10px;
+  text-transform: uppercase;
+  color: #62636d;
+  font-weight: 700;
+}
+.readinessCopy p {
+  line-height: 1.6;
+  color: #62636d;
+}
+.summaryStats {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 18px;
+}
+.summaryStats span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 11px;
+  border-radius: 999px;
+  background: #f6f4fc;
+  font-size: 12px;
+  font-weight: 700;
+}
+.crossSummary {
+  padding: 20px 24px;
+  display: flex;
+  gap: 15px;
+  align-items: flex-start;
+}
+.crossSummary h2 {
+  font-size: 17px;
+  color: #041a6c;
+}
+.crossSummary p {
+  font-size: 13px;
+  color: #62636d;
+  margin-top: 4px;
+}
+.crossSummary summary,
+.sourceDetails summary,
+.knownFields summary {
+  cursor: pointer;
+  color: #223382;
+  font-size: 12px;
+  font-weight: 800;
+  margin-top: 10px;
+}
+.iconGood,
+.iconWarn {
+  width: 42px;
+  height: 42px;
+  border-radius: 11px;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+}
+.iconGood {
+  background: #e7f8ef;
+  color: #13864a;
+}
+.iconWarn {
+  background: #fff1e4;
+  color: #d96900;
+}
+.conflictList {
+  display: grid;
+  gap: 9px;
+  margin-top: 12px;
+}
+.conflictList div {
+  display: grid;
+  gap: 3px;
+  font-size: 12px;
+}
+.conflictList strong {
+  text-transform: capitalize;
+}
+.conflictList span {
+  color: #62636d;
+}
+.documentsSection {
+  display: grid;
+  gap: 18px;
+}
+.sectionTitle {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+.sectionTitle h2 {
+  font-size: 24px;
+  color: #041a6c;
+}
+.sectionTitle p {
+  color: #62636d;
+  font-size: 13px;
+  margin-top: 4px;
+}
+.categoryStack {
+  display: grid;
+  gap: 24px;
+}
+.categoryStack > section > h3 {
+  font-size: 14px;
+  color: #041a6c;
+  margin-bottom: 10px;
+}
+.documentGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+.documentCard {
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  min-height: 245px;
+}
+.documentTop {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: flex-start;
+}
+.documentIcon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: #eef0ff;
+  color: #041a6c;
+  display: grid;
+  place-items: center;
+}
+.documentCard h3 {
+  font-size: 17px;
+  color: #041a6c;
+  margin: 18px 0 7px;
+}
+.availability {
+  font-size: 12px;
+  color: #62636d;
+  min-height: 34px;
+}
+.availability strong {
+  color: #141547;
+}
+.miniProgress {
+  height: 6px;
+  border-radius: 999px;
+  background: #eceaf4;
+  overflow: hidden;
+  margin: 12px 0;
+}
+.miniProgress span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #041a6c, #fa8615);
+}
+.sourceChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.sourceChips span {
+  font-size: 10px;
+  background: #f4f2fa;
+  color: #454651;
+  padding: 5px 7px;
+  border-radius: 999px;
+}
+.documentAction {
+  margin-top: auto;
+  padding-top: 16px;
+}
+.documentAction :global(.btn) {
+  width: 100%;
+}
+.status {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 5px 9px;
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 900;
+  background: #eef0f7;
+  color: #454651;
+  white-space: nowrap;
+}
+.status_valid,
+.status_ready_to_generate,
+.status_verified {
+  background: #e5f7ed;
+  color: #08783c;
+}
+.status_needs_attention,
+.status_missing_fields,
+.status_needs_confirmation {
+  background: #fff0df;
+  color: #b85a00;
+}
+.status_conflict,
+.status_invalid {
+  background: #ffe6e4;
+  color: #b42318;
+}
+.status_waiting_external_data {
+  background: #eef0f7;
+  color: #5c6279;
+}
+.status_draft_generated {
+  background: #e9edff;
+  color: #223382;
+}
+.status_missing {
+  background: #fff0df;
+  color: #b85a00;
+}
+.uploadPanel {
+  padding: 24px;
+}
+.uploadIntro {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+}
+.uploadIntro > span {
+  width: 44px;
+  height: 44px;
+  border-radius: 11px;
+  background: #fff0e2;
+  color: #fa8615;
+  display: grid;
+  place-items: center;
+}
+.uploadIntro h2 {
+  font-size: 18px;
+  color: #041a6c;
+}
+.uploadIntro p {
+  font-size: 12px;
+  color: #62636d;
+  margin-top: 4px;
+}
+.uploadControls {
+  display: grid;
+  grid-template-columns: 1fr minmax(220px, 1fr) auto;
+  gap: 12px;
+  align-items: end;
+  margin-top: 20px;
+}
+.uploadControls > label:first-child {
+  display: grid;
+  gap: 7px;
+}
+.uploadControls > label:first-child > span {
+  font-size: 11px;
+  font-weight: 800;
+}
+.filePicker {
+  min-height: 44px;
+  border: 1px dashed #9699ad;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  font-size: 12px;
+  cursor: pointer;
+  overflow: hidden;
+}
+.filePicker input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+.processing {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  color: #223382;
+  font-size: 12px;
+  margin-top: 15px;
+}
+.spin {
+  animation: spin 1.1s linear infinite;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.validationPanel {
+  padding: 24px;
+}
+.validationHead,
+.previewHead {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+}
+.validationHead h2,
+.previewHead h2 {
+  font-size: 22px;
+  color: #041a6c;
+  margin-top: 4px;
+}
+.validationHead p,
+.previewHead p {
+  font-size: 12px;
+  color: #62636d;
+  margin-top: 4px;
+}
+.validationStats {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin: 18px 0;
+}
+.validationStats span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #f5f3fa;
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-size: 11px;
+  font-weight: 800;
+}
+.tableWrap {
+  overflow-x: auto;
+}
+.fieldTable {
+  width: 100%;
+  border-collapse: collapse;
+}
+.fieldTable th {
+  text-align: left;
+  padding: 11px 12px;
+  background: #f5f2ff;
+  font-size: 10px;
+  text-transform: uppercase;
+  color: #62636d;
+  letter-spacing: 0.07em;
+}
+.fieldTable td {
+  padding: 14px 12px;
+  border-bottom: 1px solid #eeeaf0;
+  font-size: 12px;
+  vertical-align: top;
+}
+.fieldTable td:first-child {
+  min-width: 190px;
+}
+.required {
+  display: block;
+  color: #b85a00;
+  font-size: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-top: 4px;
+}
+.muted {
+  color: #9699ad;
+}
+.sourceDetails {
+  position: relative;
+}
+.sourceDetails summary {
+  margin: 0;
+  white-space: nowrap;
+}
+.sourcePopover {
+  display: grid;
+  gap: 10px;
+  margin-top: 8px;
+  min-width: 230px;
+  padding: 12px;
+  border-radius: 9px;
+  background: #f7f6fb;
+}
+.sourcePopover div {
+  display: grid;
+  gap: 3px;
+}
+.sourcePopover strong {
+  font-size: 11px;
+}
+.sourcePopover span,
+.sourcePopover q {
+  font-size: 10px;
+  color: #62636d;
+  line-height: 1.4;
+}
+.conflictRow td {
+  background: #fffaf4;
+}
+.conflictPanel {
+  border: 1px solid #ffc78f;
+  background: #fff8ef;
+  border-radius: 10px;
+  padding: 14px;
+}
+.conflictPanel > strong {
+  color: #9c4800;
+}
+.conflictPanel > p {
+  font-size: 10px;
+  color: #7d5a39;
+  margin-top: 9px;
+}
+.candidateGrid {
+  display: flex;
+  gap: 9px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+.candidateGrid button {
+  border: 1px solid #f4b06d;
+  background: #fff;
+  border-radius: 8px;
+  padding: 9px 11px;
+  text-align: left;
+  display: grid;
+  gap: 2px;
+  color: #141547;
+  cursor: pointer;
+}
+.candidateGrid button:hover {
+  border-color: #fa8615;
+}
+.candidateGrid button:disabled {
+  cursor: wait;
+  opacity: 0.62;
+}
+.candidateGrid small {
+  color: #62636d;
+}
+.debugPanel {
+  margin-top: 18px;
+  border-top: 1px solid #eeeaf0;
+  padding-top: 14px;
+}
+.debugPanel summary {
+  font-size: 11px;
+  color: #62636d;
+  cursor: pointer;
+}
+.debugPanel pre {
+  font-size: 10px;
+  background: #17182f;
+  color: #f5f5fa;
+  padding: 12px;
+  border-radius: 8px;
+  overflow: auto;
+  margin-top: 8px;
+}
+.breadcrumb {
+  display: flex;
+  gap: 9px;
+  align-items: center;
+  font-size: 12px;
+  color: #62636d;
+}
+.breadcrumb a {
+  color: #223382;
+}
+.generationSummary {
+  padding: 22px;
+}
+.generationSummary > div:first-child {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.generationSummary strong {
+  font-size: 18px;
+  color: #041a6c;
+}
+.generationSummary > div:first-child > span {
+  margin-left: auto;
+  font-weight: 900;
+  color: #fa8615;
+}
+.generationSummary .sourceChips {
+  margin-top: 16px;
+}
+.missingPanel {
+  padding: 24px;
+}
+.missingPanel h2,
+.waitingPanel h2 {
+  font-size: 19px;
+  color: #041a6c;
+}
+.missingPanel > p {
+  font-size: 12px;
+  color: #62636d;
+  margin: 5px 0 18px;
+}
+.missingGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+.missingGrid label {
+  display: grid;
+  gap: 7px;
+}
+.missingGrid label > span {
+  font-size: 12px;
+  font-weight: 800;
+}
+.missingGrid small {
+  font-size: 10px;
+  color: #b85a00;
+}
+.allReady {
+  padding: 18px;
+  border: 1px solid #a9dfbf;
+  background: #ecfaf2;
+  color: #08783c;
+  border-radius: 11px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-weight: 800;
+}
+.waitingPanel {
+  padding: 22px;
+  display: grid;
+  gap: 12px;
+}
+.waitingPanel > div {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #62636d;
+}
+.waitingPanel > div > span {
+  display: grid;
+  gap: 2px;
+}
+.waitingPanel strong {
+  font-size: 12px;
+  color: #141547;
+}
+.waitingPanel small {
+  font-size: 10px;
+}
+.knownFields {
+  padding: 18px;
+}
+.knownFields > summary {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+}
+.knownFields .tableWrap {
+  margin-top: 14px;
+}
+.generateBar {
+  position: sticky;
+  bottom: 18px;
+  background: #fff;
+  border: 1px solid var(--border);
+  box-shadow: 0 15px 40px rgba(20, 21, 71, 0.17);
+  border-radius: 14px;
+  padding: 15px 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 18px;
+}
+.generateBar > div {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  color: #62636d;
+  font-size: 11px;
+}
+.previewPanel {
+  padding: 24px;
+}
+.draftBadge {
+  display: inline-flex;
+  background: #fff0df;
+  color: #a94f00;
+  border-radius: 999px;
+  padding: 6px 9px;
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 900;
+}
+.previewActions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+.previewFrame {
+  width: 100%;
+  height: 720px;
+  border: 1px solid #ddd9e5;
+  border-radius: 10px;
+  margin-top: 18px;
+  background: #f7f6fa;
+}
+.previewPanel > .sourceChips {
+  margin-top: 14px;
+}
+.loading {
+  padding: 18px;
+  text-align: center;
+  color: #62636d;
+}
+.error {
+  padding: 12px 14px;
+  border-radius: 9px;
+  background: #fff0ef;
+  color: #b42318;
+  font-size: 12px;
+}
+.notice {
+  padding: 12px 14px;
+  border-radius: 9px;
+  background: #e8f8ef;
+  color: #08783c;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+}
+.filePicker:focus-within,
+.missingGrid input:focus,
+.shipmentSelector select:focus,
+.uploadControls select:focus {
+  outline: 2px solid #9eafff;
+  outline-offset: 2px;
+}
+@media (max-width: 950px) {
+  .documentGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .readinessSummary {
+    grid-template-columns: 140px 1fr;
+  }
+  .shipmentMeta {
+    display: grid;
+    gap: 4px;
+  }
+  .uploadControls {
+    grid-template-columns: 1fr 1fr;
+  }
+  .uploadControls > button {
+    grid-column: span 2;
+  }
+  .previewHead {
+    display: grid;
+  }
+  .previewActions {
+    justify-content: flex-start;
+  }
+}
+@media (max-width: 650px) {
+  .pageHeader,
+  .shipmentSelector,
+  .validationHead,
+  .generateBar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .pageHeader h1 {
+    font-size: 28px;
+  }
+  .shipmentSelector label {
+    min-width: 0;
+  }
+  .shipmentMeta {
+    margin-top: 8px;
+  }
+  .documentGrid,
+  .missingGrid {
+    grid-template-columns: 1fr;
+  }
+  .readinessSummary {
+    grid-template-columns: 1fr;
+  }
+  .readinessGauge {
+    margin: auto;
+  }
+  .uploadControls {
+    grid-template-columns: 1fr;
+  }
+  .uploadControls > button {
+    grid-column: auto;
+  }
+  .fieldTable th:nth-child(4),
+  .fieldTable td:nth-child(4) {
+    display: none;
+  }
+  .previewActions {
+    display: grid;
+  }
+  .previewFrame {
+    height: 520px;
+  }
+}
