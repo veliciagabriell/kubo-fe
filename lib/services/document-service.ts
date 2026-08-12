@@ -16,6 +16,15 @@ import type {
   GeneratedDraft,
   ShipmentDocumentHistory,
 } from "@/types/kubo";
+
+export class AdditionalInformationRequiredError extends Error {
+  constructor(
+    readonly fields: Array<{ key: string; label: string }>,
+  ) {
+    super("Additional information is required before this draft can be generated.");
+    this.name = "AdditionalInformationRequiredError";
+  }
+}
 import { documentDefinitions, documentTypeOrder } from "./document-definitions";
 import { mockForwarderCustomers } from "./mock-data";
 import { shipmentService } from "./shipment-service";
@@ -286,7 +295,17 @@ export const documentService = {
     }
     const plan = await this.prepareGeneration(shipmentId, type);
     try {
-      const response = await api.post<{ data: ApiDocument }>(`/shipments/${shipmentId}/document-drafts/${toApiType[type]}`, { fields: additionalFields });
+      const response = await api.post<{
+        data:
+          | ApiDocument
+          | {
+              status: "additional_information_required";
+              missingFields: Array<{ key: string; label: string }>;
+            };
+      }>(`/shipments/${shipmentId}/document-drafts/${toApiType[type]}`, { fields: additionalFields });
+      if ("missingFields" in response.data) {
+        throw new AdditionalInformationRequiredError(response.data.missingFields);
+      }
       return {
         id: response.data.id,
         shipmentId,

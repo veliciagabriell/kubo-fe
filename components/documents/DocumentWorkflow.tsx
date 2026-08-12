@@ -29,7 +29,11 @@ import RoleGuard from "@/components/RoleGuard";
 import { EmptyState, StatusBadge } from "@/components/common/ui";
 import { useShipments } from "@/lib/hooks";
 import { documentDefinitions, documentTypeOrder } from "@/lib/services/document-definitions";
-import { documentService, type DocumentProcessingUpdate } from "@/lib/services/document-service";
+import {
+  AdditionalInformationRequiredError,
+  documentService,
+  type DocumentProcessingUpdate,
+} from "@/lib/services/document-service";
 import type {
   DocumentCheckResult,
   DocumentGenerationPlan,
@@ -195,7 +199,30 @@ function GenerationPlanner({ shipmentId, type, mode, onGenerated }: { shipmentId
   async function generate() {
     setGenerating(true); setError("");
     try { const result = await documentService.generateDocument(shipmentId, type, values); setDraft(result); setPlan(await documentService.prepareGeneration(shipmentId, type)); onGenerated?.(result); }
-    catch { setError("Draft generation failed. Please review the required information and try again."); }
+    catch (cause) {
+      if (cause instanceof AdditionalInformationRequiredError) {
+        setPlan((current) => {
+          if (!current) return current;
+          const missing = new Map(
+            current.missingFields.map((field) => [field.key, field]),
+          );
+          cause.fields.forEach((field) =>
+            missing.set(field.key, {
+              ...field,
+              required: true,
+            }),
+          );
+          return {
+            ...current,
+            missingFields: [...missing.values()],
+            canGenerate: false,
+          };
+        });
+        setError("Complete the additional template fields shown below, then generate again.");
+      } else {
+        setError("Draft generation failed. Please review the required information and try again.");
+      }
+    }
     finally { setGenerating(false); }
   }
   if (loading) return <p className={styles.loading}>Combining Shipment Master Data…</p>;
