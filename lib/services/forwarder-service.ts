@@ -1,5 +1,14 @@
-import type { DocumentReview, FreightForwarderOffer, ForwarderCustomer, ForwarderLead } from "@/types/kubo";
-import { mockForwarderCustomers, mockForwarderLeads } from "./mock-data";
+import { api, fileUrl } from "@/lib/api";
+import type { ApiForwarderCustomer } from "@/lib/api-types";
+import type {
+  DocumentReview,
+  DocumentType,
+  ExportDocumentRecord,
+  FreightForwarderOffer,
+  ForwarderCustomer,
+  ForwarderLead,
+} from "@/types/kubo";
+import { mockForwarderLeads } from "./mock-data";
 
 const OFFER_KEY = "kubo_forwarder_offers";
 const REVIEW_KEY = "kubo_forwarder_reviews";
@@ -10,14 +19,39 @@ function appendLocal<T>(key: string, value: T) {
   localStorage.setItem(key, JSON.stringify([...current, value]));
 }
 
+const supportedDocumentTypes = new Set<DocumentType>([
+  "commercial_invoice",
+  "packing_list",
+  "certificate_of_origin",
+  "svlk",
+  "shipping_instruction",
+  "bill_of_lading",
+]);
+
+function mapCustomer(customer: ApiForwarderCustomer): ForwarderCustomer {
+  const documents = customer.documents.flatMap((document) => {
+    if (!supportedDocumentTypes.has(document.type as DocumentType)) return [];
+    return [{
+      ...document,
+      type: document.type as DocumentType,
+      status: document.status as ExportDocumentRecord["status"],
+      fileUrl: fileUrl(document.fileUrl),
+    } satisfies ExportDocumentRecord];
+  });
+  return { ...customer, documents };
+}
+
 export const forwarderService = {
   async getConfirmedCustomers(): Promise<ForwarderCustomer[]> {
-    return structuredClone(mockForwarderCustomers.filter((customer) =>
-      customer.paymentStatus === "fully_paid" || customer.paymentStatus === "deposit_paid"));
+    const response = await api.get<{ data: ApiForwarderCustomer[] }>("/forwarder/customers");
+    return response.data.map(mapCustomer);
   },
 
   async getCustomerShipment(shipmentId: string): Promise<ForwarderCustomer | null> {
-    return structuredClone(mockForwarderCustomers.find((customer) => customer.shipmentId === shipmentId) ?? null);
+    const response = await api.get<{ data: ApiForwarderCustomer }>(
+      `/forwarder/customers/${encodeURIComponent(shipmentId)}`,
+    );
+    return mapCustomer(response.data);
   },
 
   async getPotentialLeads(): Promise<ForwarderLead[]> {

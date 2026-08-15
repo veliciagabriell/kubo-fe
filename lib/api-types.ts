@@ -385,3 +385,74 @@ export interface ApiOrder {
   createdAt: string;
   updatedAt: string;
 }
+
+export interface ApiForwarderDocument {
+  id: string;
+  shipmentId: string;
+  type: string;
+  label: string;
+  fileName?: string;
+  fileUrl?: string | null;
+  status: string;
+  origin: "uploaded" | "generated" | "external";
+  version: number;
+  extractedFields: Array<{
+    fieldKey: string;
+    label: string;
+    value: string | number | null;
+    confidence?: number;
+    sourceDocumentId?: string;
+    sourcePage?: number;
+    source?: {
+      sourceType: "uploaded_document";
+      label: string;
+      documentId?: string;
+      fileName?: string;
+      page?: number;
+      rawText?: string;
+      boundingBox?: number[];
+    };
+    status: "consistent" | "confirmed";
+  }>;
+  createdAt: string;
+  updatedAt: string;
+  lastCheckedAt?: string | null;
+  checkCount?: number;
+}
+
+export interface ApiForwarderCustomer {
+  internalShipmentId: string;
+  shipmentId: string;
+  exporter: string;
+  exporterContact: string;
+  origin: string;
+  destination: string;
+  cargoReadyDate: string;
+  cargoCutoff: string;
+  cbm: number;
+  grossWeightKg: number;
+  netWeightKg: number;
+  product: string;
+  hsCode: string;
+  quantity: string;
+  packaging: string;
+  handling: string;
+  consignee: string;
+  paymentStatus: "fully_paid" | "deposit_paid";
+  amountPaid: number;
+  paymentDate: string;
+  bookingReference: string;
+  documentReadiness: number;
+  shipmentStatus: string;
+  matching: {
+    originPort: string;
+    destinationPort: string;
+    shipmentType: "Consolidated LCL";
+    estimatedDeparture: string;
+    cargoCutoff: string;
+    remainingCapacityCbm: number;
+    freightForwarder: string;
+    status: string;
+  };
+  documents: ApiForwarderDocument[];
+}

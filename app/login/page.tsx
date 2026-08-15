@@ -4,6 +4,34 @@ import { useState } from "react";
 import { ArrowRight } from "lucide-react";
 import { Brand } from "@/components/layout/AppShell";
 import { useAuth } from "@/contexts/AuthContext";
+import type { UserRole } from "@/types/kubo";
+import styles from "./login.module.css";
+
+const roleContent: Record<UserRole, {
+  heading: string;
+  description: string;
+  emailPlaceholder: string;
+  registrationLabel: string;
+  registrationAction: string;
+  registrationHref: string;
+}> = {
+  umkm: {
+    heading: "Masuk ke KUBO",
+    description: "Kelola pengiriman, dokumen, dan pembayaran ekspor Anda.",
+    emailPlaceholder: "yovie@ukiran.id",
+    registrationLabel: "Belum punya akun?",
+    registrationAction: "Daftar UMKM baru",
+    registrationHref: "/register",
+  },
+  freight_forwarder: {
+    heading: "Masuk sebagai Freight Forwarder",
+    description: "Kelola pelanggan, penawaran matching, pengiriman, dan review dokumen.",
+    emailPlaceholder: "operations@forwarder.co.id",
+    registrationLabel: "Belum terdaftar sebagai Freight Forwarder?",
+    registrationAction: "Hubungi tim KUBO",
+    registrationHref: "/support",
+  },
+};
 
 export default function LoginPage() {
   const { login } = useAuth();
@@ -11,13 +39,20 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [role, setRole] = useState<UserRole>("umkm");
+  const content = roleContent[role];
+
+  function selectRole(nextRole: UserRole) {
+    setRole(nextRole);
+    setError(null);
+  }
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setError(null);
     setSubmitting(true);
     try {
-      await login(email, password);
+      await login(email, password, role);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Gagal masuk.");
     } finally {
@@ -31,10 +66,31 @@ export default function LoginPage() {
         <Brand />
       </nav>
       <main style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: "24px" }}>
-        <form className="card" onSubmit={onSubmit} style={{ maxWidth: 400, width: "100%" }} noValidate>
-          <h1 className="page-title" style={{ marginBottom: 4 }}>Masuk ke KUBO</h1>
+        <form className={`card ${styles.loginCard}`} onSubmit={onSubmit} noValidate>
+          <div className={styles.roleSelector} role="tablist" aria-label="Pilih jenis akun">
+            <button
+              type="button"
+              role="tab"
+              aria-selected={role === "umkm"}
+              className={role === "umkm" ? styles.activeRole : undefined}
+              onClick={() => selectRole("umkm")}
+            >
+              UMKM
+            </button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected={role === "freight_forwarder"}
+              className={role === "freight_forwarder" ? styles.activeRole : undefined}
+              onClick={() => selectRole("freight_forwarder")}
+            >
+              Freight Forwarder
+            </button>
+          </div>
+          <div id="login-form-panel" role="tabpanel" className={styles.loginContext}>
+          <h1 className="page-title" style={{ marginBottom: 4 }}>{content.heading}</h1>
           <p className="page-subtitle" style={{ marginBottom: 22 }}>
-            Kelola pengiriman, dokumen, dan pembayaran ekspor Anda.
+            {content.description}
           </p>
           <div className="form-grid">
             <div className="field span-2">
@@ -46,7 +102,7 @@ export default function LoginPage() {
                 autoComplete="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="raka@rekakayu.id"
+                placeholder={content.emailPlaceholder}
               />
             </div>
             <div className="field span-2">
@@ -67,8 +123,10 @@ export default function LoginPage() {
             {submitting ? "Memproses..." : "Masuk"} <ArrowRight size={16} />
           </button>
           <p className="page-subtitle" style={{ marginTop: 18, textAlign: "center" }}>
-            Belum punya akun? <Link href="/register">Daftar UMKM baru</Link>
+            {content.registrationLabel}{" "}
+            <Link href={content.registrationHref}>{content.registrationAction}</Link>
           </p>
+          </div>
         </form>
       </main>
     </div>

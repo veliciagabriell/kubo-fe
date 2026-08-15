@@ -4,12 +4,13 @@ import { useRouter } from "next/navigation";
 import { api, ApiError, getToken, setToken } from "@/lib/api";
 import type { ApiUser } from "@/lib/api-types";
 import { homeForRole, resolveUserRole } from "@/lib/roles";
+import type { UserRole } from "@/types/kubo";
 
 interface AuthContextValue {
   user: ApiUser | null;
   loading: boolean;
   error: string | null;
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string, expectedRole: UserRole) => Promise<void>;
   register: (form: FormData) => Promise<void>;
   logout: () => void;
   refreshUser: () => Promise<void>;
@@ -46,7 +47,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [refreshUser]);
 
   const login = useCallback(
-    async (email: string, password: string) => {
+    async (email: string, password: string, expectedRole: UserRole) => {
       setError(null);
       try {
         const res = await api.post<{ user: ApiUser; access_token: string }>(
@@ -54,11 +55,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           { email, password },
           { auth: false },
         );
+        const accountRole = resolveUserRole(res.user);
+        if (accountRole !== expectedRole) {
+          const accountLabel = accountRole === "freight_forwarder" ? "Freight Forwarder" : "UMKM";
+          const selectedLabel = expectedRole === "freight_forwarder" ? "Freight Forwarder" : "UMKM";
+          throw new Error(
+            `Akun ini terdaftar sebagai ${accountLabel}. Pilih portal ${accountLabel}, bukan ${selectedLabel}.`,
+          );
+        }
         setToken(res.access_token);
         setUser(res.user);
-        router.push(homeForRole(resolveUserRole(res.user)));
+        router.push(homeForRole(accountRole));
       } catch (e) {
-        setError(e instanceof ApiError ? e.message : "Gagal masuk. Coba lagi.");
+        setError(e instanceof Error ? e.message : "Gagal masuk. Coba lagi.");
         throw e;
       }
     },
