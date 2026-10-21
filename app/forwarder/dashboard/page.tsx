@@ -1,2 +1,4 @@
 import ForwarderWorkspace from "@/components/forwarder/ForwarderWorkspace";
-export default function Page(){return <ForwarderWorkspace page="dashboard" />;}
+export default function Page() {
+  return <ForwarderWorkspace page="dashboard" />;
+}

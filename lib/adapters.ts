@@ -1,4 +1,12 @@
-import type { ContainerMatch, ExportDocument, OriginPortsInfo, Payment, Shipment, VesselIdentity, Voyage } from "@/types";
+import type {
+  ContainerMatch,
+  ExportDocument,
+  OriginPortsInfo,
+  Payment,
+  Shipment,
+  VesselIdentity,
+  Voyage,
+} from "@/types";
 import type {
   ApiContainer,
   ApiDocument,
@@ -77,7 +85,12 @@ export function mapVesselIdentity(v: ApiVessel): VesselIdentity {
 }
 
 export function mapOriginPortsInfo(o: ApiOriginPortsInfo): OriginPortsInfo {
-  return { jepara: o.jepara, distances: o.distances, recommended: o.recommended, justification: o.justification };
+  return {
+    jepara: o.jepara,
+    distances: o.distances,
+    recommended: o.recommended,
+    justification: o.justification,
+  };
 }
 
 export function mapVoyage(v: ApiVoyage): Voyage {
@@ -94,7 +107,9 @@ export function mapVoyage(v: ApiVoyage): Voyage {
   };
 }
 
-export function mapContainerMatch(c: ApiContainer | ApiScoredContainer): ContainerMatch {
+export function mapContainerMatch(
+  c: ApiContainer | ApiScoredContainer,
+): ContainerMatch {
   const scored = "aiRationale" in c ? c : null;
   return {
     id: c.id,
@@ -125,13 +140,16 @@ export function mapContainerMatch(c: ApiContainer | ApiScoredContainer): Contain
   };
 }
 
-export function mapDocument(d: ApiDocument, typeInfo?: ApiDocumentTypeInfo[]): ExportDocument {
+export function mapDocument(
+  d: ApiDocument,
+  typeInfo?: ApiDocumentTypeInfo[],
+): ExportDocument {
   const info = typeInfo?.find((t) => t.type === d.type);
   const type = d.type ?? "UNCLASSIFIED";
   return {
     id: d.id,
     type,
-    typeLabel: info?.label ?? (d.type ? d.type : "Dokumen diunggah"),
+    typeLabel: info?.label ?? (d.type ? d.type : "Uploaded Document"),
     category: info?.category ?? "",
     shipmentId: d.shipmentId,
     status: d.status as ExportDocument["status"],
@@ -142,12 +160,15 @@ export function mapDocument(d: ApiDocument, typeInfo?: ApiDocumentTypeInfo[]): E
 }
 
 const PAYMENT_METHOD_LABEL: Record<ApiOrder["paymentMethod"], string> = {
-  bank_transfer: "Transfer Bank",
-  credit_card: "Kartu Kredit / Debit",
+  bank_transfer: "Bank Transfer",
+  credit_card: "Credit / Debit Card",
   e_wallet: "E-Wallet",
 };
 
-const ORDER_STATUS_TO_PAYMENT_STATUS: Record<ApiOrder["status"], Payment["status"]> = {
+const ORDER_STATUS_TO_PAYMENT_STATUS: Record<
+  ApiOrder["status"],
+  Payment["status"]
+> = {
   pending: "Deposit Required",
   completed: "Fully Paid",
   refunded: "Refunded",
@@ -161,6 +182,6 @@ export function mapOrderToPayment(o: ApiOrder, shipmentCode?: string): Payment {
     amount: o.amountIdr,
     status: ORDER_STATUS_TO_PAYMENT_STATUS[o.status],
     method: PAYMENT_METHOD_LABEL[o.paymentMethod],
-    description: `Pembayaran ekspor ke ${o.destination}`,
+    description: `Export payment to ${o.destination}`,
   };
 }

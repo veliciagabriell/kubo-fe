@@ -7,29 +7,33 @@ import { useAuth } from "@/contexts/AuthContext";
 import type { UserRole } from "@/types/kubo";
 import styles from "./login.module.css";
 
-const roleContent: Record<UserRole, {
-  heading: string;
-  description: string;
-  emailPlaceholder: string;
-  registrationLabel: string;
-  registrationAction: string;
-  registrationHref: string;
-}> = {
+const roleContent: Record<
+  UserRole,
+  {
+    heading: string;
+    description: string;
+    emailPlaceholder: string;
+    registrationLabel: string;
+    registrationAction: string;
+    registrationHref: string;
+  }
+> = {
   umkm: {
-    heading: "Masuk ke KUBO",
-    description: "Kelola pengiriman, dokumen, dan pembayaran ekspor Anda.",
+    heading: "Sign in to KUBO",
+    description: "Manage your export shipments, documents, and payments.",
     emailPlaceholder: "yovie@ukiran.id",
-    registrationLabel: "Belum punya akun?",
-    registrationAction: "Daftar UMKM baru",
+    registrationLabel: "Don't have an account?",
+    registrationAction: "Register as an Exporter",
     registrationHref: "/register",
   },
   freight_forwarder: {
-    heading: "Masuk sebagai Freight Forwarder",
-    description: "Kelola pelanggan, penawaran matching, pengiriman, dan review dokumen.",
+    heading: "Sign in as a Freight Forwarder",
+    description:
+      "Manage customers, shipment documents, capacity, and export leads.",
     emailPlaceholder: "operations@forwarder.co.id",
-    registrationLabel: "Belum terdaftar sebagai Freight Forwarder?",
-    registrationAction: "Hubungi tim KUBO",
-    registrationHref: "/support",
+    registrationLabel: "Don't have an account?",
+    registrationAction: "Register as a Freight Forwarder",
+    registrationHref: "/register",
   },
 };
 
@@ -54,20 +58,39 @@ export default function LoginPage() {
     try {
       await login(email, password, role);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Gagal masuk.");
+      setError(err instanceof Error ? err.message : "Sign-in failed.");
     } finally {
       setSubmitting(false);
     }
   }
 
   return (
-    <div className="landing" style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
-      <nav className="landing-nav" aria-label="Navigasi login">
+    <div
+      className="landing"
+      style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}
+    >
+      <nav className="landing-nav" aria-label="Login navigation">
         <Brand />
       </nav>
-      <main style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: "24px" }}>
-        <form className={`card ${styles.loginCard}`} onSubmit={onSubmit} noValidate>
-          <div className={styles.roleSelector} role="tablist" aria-label="Pilih jenis akun">
+      <main
+        style={{
+          flex: 1,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: "24px",
+        }}
+      >
+        <form
+          className={`card ${styles.loginCard}`}
+          onSubmit={onSubmit}
+          noValidate
+        >
+          <div
+            className={styles.roleSelector}
+            role="tablist"
+            aria-label="Select account type"
+          >
             <button
               type="button"
               role="tab"
@@ -75,57 +98,80 @@ export default function LoginPage() {
               className={role === "umkm" ? styles.activeRole : undefined}
               onClick={() => selectRole("umkm")}
             >
-              UMKM
+              Exporter / MSME
             </button>
             <button
               type="button"
               role="tab"
               aria-selected={role === "freight_forwarder"}
-              className={role === "freight_forwarder" ? styles.activeRole : undefined}
+              className={
+                role === "freight_forwarder" ? styles.activeRole : undefined
+              }
               onClick={() => selectRole("freight_forwarder")}
             >
               Freight Forwarder
             </button>
           </div>
-          <div id="login-form-panel" role="tabpanel" className={styles.loginContext}>
-          <h1 className="page-title" style={{ marginBottom: 4 }}>{content.heading}</h1>
-          <p className="page-subtitle" style={{ marginBottom: 22 }}>
-            {content.description}
-          </p>
-          <div className="form-grid">
-            <div className="field span-2">
-              <label htmlFor="email">Email</label>
-              <input
-                id="email"
-                type="email"
-                required
-                autoComplete="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder={content.emailPlaceholder}
-              />
+          <div
+            id="login-form-panel"
+            role="tabpanel"
+            className={styles.loginContext}
+          >
+            <h1 className="page-title" style={{ marginBottom: 4 }}>
+              {content.heading}
+            </h1>
+            <p className="page-subtitle" style={{ marginBottom: 22 }}>
+              {content.description}
+            </p>
+            <div className="form-grid">
+              <div className="field span-2">
+                <label htmlFor="email">Email</label>
+                <input
+                  id="email"
+                  type="email"
+                  required
+                  autoComplete="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder={content.emailPlaceholder}
+                />
+              </div>
+              <div className="field span-2">
+                <label htmlFor="password">Password</label>
+                <input
+                  id="password"
+                  type="password"
+                  required
+                  autoComplete="current-password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                />
+              </div>
             </div>
-            <div className="field span-2">
-              <label htmlFor="password">Kata sandi</label>
-              <input
-                id="password"
-                type="password"
-                required
-                autoComplete="current-password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-              />
-            </div>
-          </div>
-          {error && <p className="field-error" style={{ marginTop: 12 }}>{error}</p>}
-          <button className="btn btn-primary" type="submit" disabled={submitting} style={{ width: "100%", marginTop: 20 }}>
-            {submitting ? "Memproses..." : "Masuk"} <ArrowRight size={16} />
-          </button>
-          <p className="page-subtitle" style={{ marginTop: 18, textAlign: "center" }}>
-            {content.registrationLabel}{" "}
-            <Link href={content.registrationHref}>{content.registrationAction}</Link>
-          </p>
+            {error && (
+              <p className="field-error" style={{ marginTop: 12 }}>
+                {error}
+              </p>
+            )}
+            <button
+              className="btn btn-primary"
+              type="submit"
+              disabled={submitting}
+              style={{ width: "100%", marginTop: 20 }}
+            >
+              {submitting ? "Signing In..." : "Sign In"}{" "}
+              <ArrowRight size={16} />
+            </button>
+            <p
+              className="page-subtitle"
+              style={{ marginTop: 18, textAlign: "center" }}
+            >
+              {content.registrationLabel}{" "}
+              <Link href={content.registrationHref}>
+                {content.registrationAction}
+              </Link>
+            </p>
           </div>
         </form>
       </main>

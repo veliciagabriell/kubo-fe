@@ -9,8 +9,12 @@ const jakarta = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-  title: { default: "KUBO — Ekspor Bersama, Tumbuh Bersama", template: "%s | KUBO" },
-  description: "Platform konsolidasi ekspor furniture untuk UMKM Indonesia.",
+  title: {
+    default: "KUBO — Ekspor Bersama, Tumbuh Bersama",
+    template: "%s | KUBO",
+  },
+  description:
+    "Furniture export consolidation platform for Indonesian Exporters and MSMEs.",
 };
 
 export default function RootLayout({
@@ -19,10 +23,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="id"
-      className={`${jakarta.variable} h-full antialiased`}
-    >
+    <html lang="id" className={`${jakarta.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col">
         <AuthProvider>{children}</AuthProvider>
       </body>

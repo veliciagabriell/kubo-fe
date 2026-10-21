@@ -1,10 +1,14 @@
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api/v1";
-export const API_ORIGIN = process.env.NEXT_PUBLIC_API_ORIGIN || "http://localhost:3000";
+import { localizeApiMessage } from "@/lib/ui-copy";
+
+const API_BASE =
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api/v1";
+export const API_ORIGIN =
+  process.env.NEXT_PUBLIC_API_ORIGIN || "http://localhost:3000";
 
 export class ApiError extends Error {
   status: number;
   constructor(message: string, status: number) {
-    super(message);
+    super(localizeApiMessage(message));
     this.status = status;
   }
 }
@@ -30,7 +34,10 @@ interface RequestOptions extends Omit<RequestInit, "body"> {
   auth?: boolean;
 }
 
-async function request<T>(path: string, options: RequestOptions = {}): Promise<T> {
+async function request<T>(
+  path: string,
+  options: RequestOptions = {},
+): Promise<T> {
   const { body, auth = true, headers, ...rest } = options;
   const isFormData = body instanceof FormData;
   const finalHeaders: Record<string, string> = {
@@ -46,7 +53,12 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
   const res = await fetch(`${API_BASE}${path}`, {
     ...rest,
     headers: finalHeaders,
-    body: body === undefined ? undefined : isFormData ? (body as FormData) : JSON.stringify(body),
+    body:
+      body === undefined
+        ? undefined
+        : isFormData
+          ? (body as FormData)
+          : JSON.stringify(body),
   });
 
   const text = await res.text();
@@ -54,14 +66,18 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
 
   if (!res.ok) {
     const message = data?.message || `Request failed with status ${res.status}`;
-    throw new ApiError(Array.isArray(message) ? message.join(", ") : message, res.status);
+    throw new ApiError(
+      Array.isArray(message) ? message.join(", ") : message,
+      res.status,
+    );
   }
 
   return data as T;
 }
 
 export const api = {
-  get: <T>(path: string, options?: RequestOptions) => request<T>(path, { ...options, method: "GET" }),
+  get: <T>(path: string, options?: RequestOptions) =>
+    request<T>(path, { ...options, method: "GET" }),
   post: <T>(path: string, body?: unknown, options?: RequestOptions) =>
     request<T>(path, { ...options, method: "POST", body }),
   patch: <T>(path: string, body?: unknown, options?: RequestOptions) =>

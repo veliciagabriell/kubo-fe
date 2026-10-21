@@ -101,7 +101,8 @@ export interface ApiVoyage {
   id: string;
   originPort: string;
   destinationPort: string | null;
-  destinationConfidence: "guessed_from_ais_text" | "confirmed_by_geofence" | null;
+  destinationConfidence:
+    "guessed_from_ais_text" | "confirmed_by_geofence" | null;
   status: "AWAITING_DEPARTURE" | "DEPARTED" | "ARRIVED" | "STALE";
   departedAt: string | null;
   arrivedAt: string | null;
@@ -115,7 +116,8 @@ export interface ApiContainer {
   vesselMmsi: string;
   destinationCountry: string;
   destinationCity: string;
-  destinationConfidence: "guessed_from_ais_text" | "confirmed_by_geofence" | null;
+  destinationConfidence:
+    "guessed_from_ais_text" | "confirmed_by_geofence" | null;
   originPort: string;
   containerType: string;
   totalCapacityCbm: number;

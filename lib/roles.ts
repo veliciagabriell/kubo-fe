@@ -3,8 +3,10 @@ import type { UserRole } from "@/types/kubo";
 
 export function resolveUserRole(user: ApiUser | null | undefined): UserRole {
   const previewRole = process.env.NEXT_PUBLIC_DEFAULT_USER_ROLE;
-  if (previewRole === "freight_forwarder" || previewRole === "umkm") return previewRole;
-  if (user?.role === "freight_forwarder" || user?.role === "umkm") return user.role;
+  if (previewRole === "freight_forwarder" || previewRole === "umkm")
+    return previewRole;
+  if (user?.role === "freight_forwarder" || user?.role === "umkm")
+    return user.role;
   return /freight|forwarder|logistic|shipping/i.test(user?.businessType ?? "")
     ? "freight_forwarder"
     : "umkm";

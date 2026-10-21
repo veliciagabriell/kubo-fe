@@ -1,2 +1,4 @@
 import { DocumentAssistantScreen } from "@/components/documents/DocumentAssistant";
-export default function Page(){return <DocumentAssistantScreen/>;}
+export default function Page() {
+  return <DocumentAssistantScreen />;
+}

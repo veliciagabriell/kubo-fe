@@ -1,5 +1,11 @@
 "use client";
-import { createContext, useCallback, useContext, useEffect, useState } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 import { useRouter } from "next/navigation";
 import { api, ApiError, getToken, setToken } from "@/lib/api";
 import type { ApiUser } from "@/lib/api-types";
@@ -10,7 +16,11 @@ interface AuthContextValue {
   user: ApiUser | null;
   loading: boolean;
   error: string | null;
-  login: (email: string, password: string, expectedRole: UserRole) => Promise<void>;
+  login: (
+    email: string,
+    password: string,
+    expectedRole: UserRole,
+  ) => Promise<void>;
   register: (form: FormData) => Promise<void>;
   logout: () => void;
   refreshUser: () => Promise<void>;
@@ -57,17 +67,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         );
         const accountRole = resolveUserRole(res.user);
         if (accountRole !== expectedRole) {
-          const accountLabel = accountRole === "freight_forwarder" ? "Freight Forwarder" : "UMKM";
-          const selectedLabel = expectedRole === "freight_forwarder" ? "Freight Forwarder" : "UMKM";
+          const accountLabel =
+            accountRole === "freight_forwarder"
+              ? "Freight Forwarder"
+              : "Exporter / MSME";
+          const selectedLabel =
+            expectedRole === "freight_forwarder"
+              ? "Freight Forwarder"
+              : "Exporter / MSME";
           throw new Error(
-            `Akun ini terdaftar sebagai ${accountLabel}. Pilih portal ${accountLabel}, bukan ${selectedLabel}.`,
+            `This account is registered as ${accountLabel}. Select the ${accountLabel} portal, not ${selectedLabel}.`,
           );
         }
         setToken(res.access_token);
         setUser(res.user);
         router.push(homeForRole(accountRole));
       } catch (e) {
-        setError(e instanceof Error ? e.message : "Gagal masuk. Coba lagi.");
+        setError(
+          e instanceof Error ? e.message : "Sign-in failed. Please try again.",
+        );
         throw e;
       }
     },
@@ -87,7 +105,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setUser(res.user);
         router.push(homeForRole(resolveUserRole(res.user)));
       } catch (e) {
-        setError(e instanceof ApiError ? e.message : "Gagal mendaftar. Coba lagi.");
+        setError(
+          e instanceof ApiError
+            ? e.message
+            : "Registration failed. Please try again.",
+        );
         throw e;
       }
     },
@@ -101,7 +123,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [router]);
 
   return (
-    <AuthContext.Provider value={{ user, loading, error, login, register, logout, refreshUser }}>
+    <AuthContext.Provider
+      value={{ user, loading, error, login, register, logout, refreshUser }}
+    >
       {children}
     </AuthContext.Provider>
   );

@@ -1,2 +1,4 @@
 import AppPage from "@/components/AppPage";
-export default function Page(){return <AppPage kind="shipments"/>}
+export default function Page() {
+  return <AppPage kind="shipments" />;
+}
